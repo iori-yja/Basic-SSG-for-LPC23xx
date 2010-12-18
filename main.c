@@ -1,18 +1,18 @@
 #include"LPC23xx.h"
 #include"interrupt.h"
 #include"drv.h"
-/* ƒ|[ƒgƒRƒ“ƒgƒ[ƒ‰‚ÌƒŒƒWƒXƒ^ */
+/* ãƒãƒ¼ãƒˆã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã®ãƒ¬ã‚¸ã‚¹ã‚¿ */
 #define GPIO_PINSEL1	((volatile unsigned int *)(0xE002C004))
 #define GPIO_PINMODE1	((volatile unsigned int *)(0xE002C044))
 
 
-/* Š„‚è‚İƒRƒ“ƒgƒ[ƒ‰(VIC)‚ÌƒŒƒWƒXƒ^ */
+/* å‰²ã‚Šè¾¼ã¿ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©(VIC)ã®ãƒ¬ã‚¸ã‚¹ã‚¿ */
 #define TIMER0_INT_BIT  (0x00000010)
 #define WRITTEN 10
 int g_i=1;
 
 void Delay(volatile unsigned long nCount);
-/* IRQ Š„‚è‚İˆ— */
+/* IRQ å‰²ã‚Šè¾¼ã¿å‡¦ç† */
 /*__irq __arm void IRQ_Handler()*/
 /*******************************************************/
 
@@ -59,16 +59,16 @@ int main(void)
 {
 	SCS = SCS | 1;    //FGPIO Select
 	set_pll();
-	VICIntSelect = 0;	//‘S‚Ä‚ÌŠ„‚è‚İ‚ğFIQ‚Å‚Í‚È‚­IRQ‚É‚·‚é
-	T0PR  =  0x00000000;	/* ƒvƒŠƒXƒP[ƒ‹–³‚µ  */
-	PCLKSEL1=0x00000004; /*TIMER0‚ğCPU‘¬“x‚Å*/
+	VICIntSelect = 0;	//å…¨ã¦ã®å‰²ã‚Šè¾¼ã¿ã‚’FIQã§ã¯ãªãIRQã«ã™ã‚‹
+	T0PR  =  0x00000000;	/* ãƒ—ãƒªã‚¹ã‚±ãƒ¼ãƒ«ç„¡ã—  */
+	PCLKSEL1=0x00000004; /*TIMER0ã‚’CPUé€Ÿåº¦ã§*/
 	T0MR0 =  72000000;	/*0.1ms=1C20*/
-	T0MCR =  0x00000003;	/* Match‚ÉTCƒNƒŠƒA & Š„‚è‚İ */
-	/* VIC‚ÉŠ„‚è‚İ‹–‰Â‚ğw¦‚·‚é        */
+	T0MCR =  0x00000003;	/* Matchæ™‚ã«TCã‚¯ãƒªã‚¢ & å‰²ã‚Šè¾¼ã¿ */
+	/* VICã«å‰²ã‚Šè¾¼ã¿è¨±å¯ã‚’æŒ‡ç¤ºã™ã‚‹        */
 	VICIntEnable = TIMER0_INT_BIT;
 	RegisterVector(TIMER0_INT, Isr_TIMER0, PRI_LOWEST, CLASS_IRQ);
 	IrqEnable();
-	/* ƒ^ƒCƒ}ƒXƒ^[ƒg                     */
+	/* ã‚¿ã‚¤ãƒã‚¹ã‚¿ãƒ¼ãƒˆ                     */
 	T0TCR = 1;
 
 
