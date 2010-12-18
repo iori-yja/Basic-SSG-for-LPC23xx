@@ -1,0 +1,1157 @@
+
+main.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000067c  00000000  00000000  00008000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000004  40000000  0000067c  00010000  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000008  40000004  00000680  00010004  2**0
+                  ALLOC
+  3 .stack        00000a00  40000010  40000010  00010008  2**3
+                  CONTENTS
+  4 .ARM.attributes 0000002e  00000000  00000000  00010a08  2**0
+                  CONTENTS, READONLY
+  5 .comment      00000056  00000000  00000000  00010a36  2**0
+                  CONTENTS, READONLY
+  6 .debug_aranges 000000d0  00000000  00000000  00010a90  2**3
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_pubnames 00000143  00000000  00000000  00010b60  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_info   000003ea  00000000  00000000  00010ca3  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_abbrev 000001a9  00000000  00000000  0001108d  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_line   00000356  00000000  00000000  00011236  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_frame  0000019c  00000000  00000000  0001158c  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_str    00000199  00000000  00000000  00011728  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 13 .debug_loc    000001b1  00000000  00000000  000118c1  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 14 .debug_ranges 000000b8  00000000  00000000  00011a78  2**3
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <Trap-0x3c>:
+@-----------------------------------------------------------@
+
+.section .VECTOR, "ax"
+.arm
+
+	LDR	PC, [PC, #24]	@ Reset entry, jump to reset handler
+   0:	e59ff018 	ldr	pc, [pc, #24]	; 20 <B_Thumb>
+	LDR	PC, [PC, #24]	@ Undef entry, trap
+   4:	e59ff018 	ldr	pc, [pc, #24]	; 24 <VIC_SWPriorityMask>
+	LDR	PC, [PC, #24]	@ SWI entry, jump to SWI handler
+   8:	e59ff018 	ldr	pc, [pc, #24]	; 28 <VIC_SWPriorityMask+0x4>
+	LDR	PC, [PC, #24]	@ PAbt entry, trap
+   c:	e59ff018 	ldr	pc, [pc, #24]	; 2c <VIC_SWPriorityMask+0x8>
+	LDR	PC, [PC, #24]	@ DAbt entry, trap
+  10:	e59ff018 	ldr	pc, [pc, #24]	; 30 <VIC_SWPriorityMask+0xc>
+  14:	0000      	.short	0x0000
+  16:	00          	.byte	0x00
+  17:	00          	.byte	0x00
+	.word	0
+	LDR	PC, [PC, #20]	@ IRQ entry, jump to IRQ handler
+  18:	e59ff014 	ldr	pc, [pc, #20]	; 34 <VIC_SWPriorityMask+0x10>
+	LDR     PC, [PC, #20]	@ FIQ entry, trap
+  1c:	e59ff014 	ldr	pc, [pc, #20]	; 38 <VIC_SWPriorityMask+0x14>
+  20:	00000040 	.word	0x00000040
+  24:	0000003c 	.word	0x0000003c
+  28:	00000124 	.word	0x00000124
+  2c:	0000003c 	.word	0x0000003c
+  30:	0000003c 	.word	0x0000003c
+  34:	000000e0 	.word	0x000000e0
+  38:	0000003c 	.word	0x0000003c
+
+0000003c <Trap>:
+	.word	Trap		@ Prefetch Abort handler
+	.word	Trap		@ Data Abort handler
+	.word	IRQ_Handler	@ IRQ handler
+	.word	Trap		@ FIQ handler
+
+Trap:	B	Trap		@ Unused exception trap (infinite loop)
+  3c:	eafffffe 	b	3c <Trap>
+
+00000040 <Reset_Handler>:
+@	LDR	R0, =TargetResetInit
+@	MOV	LR, PC
+@	BX	R0
+
+@ Setup Stack for each mode
+	LDR	R0, =Stack_Top
+  40:	e59f0360 	ldr	r0, [pc, #864]	; 3a8 <sb_align+0x18>
+
+@ Enter Undefined Instruction Mode and set its Stack Pointer
+	MSR	CPSR_c, #M_UND | B_Irq | B_Fiq
+  44:	e321f0db 	msr	CPSR_c, #219	; 0xdb
+	MOV	SP, R0
+  48:	e1a0d000 	mov	sp, r0
+	SUB	R0, R0, #UND_Stack_Size
+  4c:	e2400000 	sub	r0, r0, #0	; 0x0
+
+@ Enter Abort Mode and set its Stack Pointer
+	MSR	CPSR_c, #M_ABT | B_Irq | B_Fiq
+  50:	e321f0d7 	msr	CPSR_c, #215	; 0xd7
+	MOV	SP, R0
+  54:	e1a0d000 	mov	sp, r0
+	SUB	R0, R0, #ABT_Stack_Size
+  58:	e2400000 	sub	r0, r0, #0	; 0x0
+
+@ Enter FIQ Mode and set its Stack Pointer
+	MSR	CPSR_c, #M_FIQ | B_Irq | B_Fiq
+  5c:	e321f0d1 	msr	CPSR_c, #209	; 0xd1
+	MOV	SP, R0
+  60:	e1a0d000 	mov	sp, r0
+	SUB	R0, R0, #FIQ_Stack_Size
+  64:	e2400000 	sub	r0, r0, #0	; 0x0
+
+@ Enter IRQ Mode and set its Stack Pointer
+	MSR	CPSR_c, #M_IRQ | B_Irq | B_Fiq
+  68:	e321f0d2 	msr	CPSR_c, #210	; 0xd2
+	MOV	SP, R0
+  6c:	e1a0d000 	mov	sp, r0
+	SUB	R0, R0, #IRQ_Stack_Size
+  70:	e2400c01 	sub	r0, r0, #256	; 0x100
+
+@ Enter Supervisor Mode and set its Stack Pointer
+	MSR	CPSR_c, #M_SVC | B_Irq | B_Fiq
+  74:	e321f0d3 	msr	CPSR_c, #211	; 0xd3
+	MOV	SP, R0
+  78:	e1a0d000 	mov	sp, r0
+	SUB	R0, R0, #SVC_Stack_Size
+  7c:	e2400c01 	sub	r0, r0, #256	; 0x100
+
+@ Enter User Mode and set its Stack Pointer
+	MSR	CPSR_c, #M_USR | B_Irq | B_Fiq
+  80:	e321f0d0 	msr	CPSR_c, #208	; 0xd0
+	MOV	SP, R0
+  84:	e1a0d000 	mov	sp, r0
+	SUB	SL, SP, #USR_Stack_Size
+  88:	e24dab02 	sub	sl, sp, #2048	; 0x800
+
+@ Relocate .data section (Initialize with ROM data)
+	LDR	R1, =_etext
+  8c:	e59f1318 	ldr	r1, [pc, #792]	; 3ac <sb_align+0x1c>
+	LDR	R2, =_data
+  90:	e59f2318 	ldr	r2, [pc, #792]	; 3b0 <sb_align+0x20>
+	LDR	R3, =_edata
+  94:	e59f3318 	ldr	r3, [pc, #792]	; 3b4 <sb_align+0x24>
+	CMP	R2, R3
+  98:	e1520003 	cmp	r2, r3
+	BEQ	DataIsEmpty
+  9c:	0a000003 	beq	b0 <DataIsEmpty>
+
+000000a0 <LoopRel>:
+LoopRel:CMP	R2, R3
+  a0:	e1520003 	cmp	r2, r3
+	LDRLO	R0, [R1], #4
+  a4:	34910004 	ldrcc	r0, [r1], #4
+	STRLO	R0, [R2], #4
+  a8:	34820004 	strcc	r0, [r2], #4
+	BLO	LoopRel
+  ac:	3afffffb 	bcc	a0 <LoopRel>
+
+000000b0 <DataIsEmpty>:
+DataIsEmpty:
+
+@ Clear .bss section (Initialize with 0)
+	MOV	R0, #0
+  b0:	e3a00000 	mov	r0, #0	; 0x0
+	LDR	R1, =__bss_start__
+  b4:	e59f12fc 	ldr	r1, [pc, #764]	; 3b8 <sb_align+0x28>
+	LDR	R2, =__bss_end__
+  b8:	e59f22fc 	ldr	r2, [pc, #764]	; 3bc <sb_align+0x2c>
+	CMP	R1,R2
+  bc:	e1510002 	cmp	r1, r2
+	BEQ	BSSIsEmpty
+  c0:	0a000002 	beq	d0 <BSSIsEmpty>
+
+000000c4 <LoopZI>:
+LoopZI:	CMP	R1, R2
+  c4:	e1510002 	cmp	r1, r2
+	STRLO	R0, [R1], #4
+  c8:	34810004 	strcc	r0, [r1], #4
+	BLO	LoopZI
+  cc:	3afffffc 	bcc	c4 <LoopZI>
+
+000000d0 <BSSIsEmpty>:
+BSSIsEmpty:
+
+@ Start main()
+.extern main
+	LDR	R0, =main
+  d0:	e59f02e8 	ldr	r0, [pc, #744]	; 3c0 <sb_align+0x30>
+	MOV	LR, PC
+  d4:	e1a0e00f 	mov	lr, pc
+	BX	R0
+  d8:	e12fff10 	bx	r0
+
+000000dc <MTrap>:
+MTrap:	B	MTrap	@ Trap if main() terminated
+  dc:	eafffffe 	b	dc <MTrap>
+
+000000e0 <IRQ_Handler>:
+.equ VIC_VectAddr,	0xF00
+
+.section .text, "ax"
+.arm
+IRQ_Handler:
+	SUB	LR, LR, #4		@ Adjust LR_irq and push it
+  e0:	e24ee004 	sub	lr, lr, #4	; 0x4
+	STMFD	SP!, {LR}
+  e4:	e92d4000 	push	{lr}
+
+	MRS	LR, SPSR		@ Save SPSR need to be saved for nested interrupt
+  e8:	e14fe000 	mrs	lr, SPSR
+	STMFD	SP!, {R0-R3,IP,LR}	@ Push scratch/used registers and SPSR
+  ec:	e92d500f 	push	{r0, r1, r2, r3, ip, lr}
+	LDR	R0, =LPC_BASE_VIC	@ Get the ISR address pointed by VIC_VectAddr
+  f0:	e59f02cc 	ldr	r0, [pc, #716]	; 3c4 <sb_align+0x34>
+	LDR	R0, [R0, #VIC_VectAddr]
+  f4:	e5900f00 	ldr	r0, [r0, #3840]
+	MSR	CPSR_c, #M_SVC		@ Enter SVC mode and enable Irq and Fiq
+  f8:	e321f013 	msr	CPSR_c, #19	; 0x13
+
+	STMFD	SP!, {LR}		@ Call the ISR
+  fc:	e92d4000 	push	{lr}
+	MOV	LR, PC
+ 100:	e1a0e00f 	mov	lr, pc
+	BX	R0
+ 104:	e12fff10 	bx	r0
+	LDMIA	SP!, {LR}
+ 108:	e8bd4000 	pop	{lr}
+
+	MSR	CPSR_c, #M_IRQ | B_Irq	@ Enter IRQ mode and disable Irq
+ 10c:	e321f092 	msr	CPSR_c, #146	; 0x92
+	LDMIA	SP!, {R0-R3,IP,LR}	@ Restore scratch/used registers and SPSR
+ 110:	e8bd500f 	pop	{r0, r1, r2, r3, ip, lr}
+	MSR	SPSR_cxsf, LR		@ Restore SPSR_irq
+ 114:	e16ff00e 	msr	SPSR_fsxc, lr
+
+	LDR	LR, =LPC_BASE_VIC	@ Issue EOI command to the VIC
+ 118:	e59fe2a4 	ldr	lr, [pc, #676]	; 3c4 <sb_align+0x34>
+	STR	LR, [LR, #VIC_VectAddr]
+ 11c:	e58eef00 	str	lr, [lr, #3840]
+
+	LDMIA	SP!, {PC}^		@ Reruen from the IRQ handler
+ 120:	e8fd8000 	ldm	sp!, {pc}^
+
+00000124 <SWI_Handler>:
+
+
+.section .text, "ax"
+.arm
+SWI_Handler:
+	LDR	IP, [LR, #-4]		@ Get swi instruction code (assuming ARM state)
+ 124:	e51ec004 	ldr	ip, [lr, #-4]
+	AND	IP, #0xFF		@ Get swi comment field (lower 8 bit)
+ 128:	e20cc0ff 	and	ip, ip, #255	; 0xff
+	CMP	IP, #NUM_SWIs		@ Check range
+ 12c:	e35c0006 	cmp	ip, #6	; 0x6
+	LDRLO	PC, [PC, IP, LSL #2]	@ Jump each service function when code is valid
+ 130:	379ff10c 	ldrcc	pc, [pc, ip, lsl #2]
+	MOVS	PC, LR			@ Otherwise return
+ 134:	e1b0f00e 	movs	pc, lr
+ 138:	00000150 	.word	0x00000150
+ 13c:	00000160 	.word	0x00000160
+ 140:	00000170 	.word	0x00000170
+ 144:	00000180 	.word	0x00000180
+ 148:	00000190 	.word	0x00000190
+ 14c:	000001b4 	.word	0x000001b4
+
+00000150 <IRQDisable>:
+	.word	FIQEnable
+	.word	ClearVect
+	.word	RegVect
+
+IRQDisable:
+	MRS	R0, SPSR
+ 150:	e14f0000 	mrs	r0, SPSR
+	ORR	R0, R0, #B_Irq
+ 154:	e3800080 	orr	r0, r0, #128	; 0x80
+	MSR	SPSR_c, R0
+ 158:	e161f000 	msr	SPSR_c, r0
+	MOVS	PC, LR
+ 15c:	e1b0f00e 	movs	pc, lr
+
+00000160 <IRQEnable>:
+
+IRQEnable:
+	MRS	R0, SPSR
+ 160:	e14f0000 	mrs	r0, SPSR
+	BIC	R0, R0, #B_Irq
+ 164:	e3c00080 	bic	r0, r0, #128	; 0x80
+	MSR	SPSR_c, R0
+ 168:	e161f000 	msr	SPSR_c, r0
+	MOVS	PC, LR
+ 16c:	e1b0f00e 	movs	pc, lr
+
+00000170 <FIQDisable>:
+
+FIQDisable:
+	MRS	R0, SPSR
+ 170:	e14f0000 	mrs	r0, SPSR
+	ORR	R0, R0, #B_Fiq
+ 174:	e3800040 	orr	r0, r0, #64	; 0x40
+	MSR	SPSR_c, R0
+ 178:	e161f000 	msr	SPSR_c, r0
+	MOVS	PC, LR
+ 17c:	e1b0f00e 	movs	pc, lr
+
+00000180 <FIQEnable>:
+
+FIQEnable:
+	MRS	R0, SPSR
+ 180:	e14f0000 	mrs	r0, SPSR
+	BIC	R0, R0, #B_Fiq
+ 184:	e3c00040 	bic	r0, r0, #64	; 0x40
+	MSR	SPSR_c, R0
+ 188:	e161f000 	msr	SPSR_c, r0
+	MOVS	PC, LR
+ 18c:	e1b0f00e 	movs	pc, lr
+
+00000190 <ClearVect>:
+
+ClearVect:
+	LDR	IP, =LPC_BASE_VIC
+ 190:	e59fc22c 	ldr	ip, [pc, #556]	; 3c4 <sb_align+0x34>
+	MVN	R0, #0				@ Disable all interrupts
+ 194:	e3e00000 	mvn	r0, #0	; 0x0
+	STR	R0, [IP, #VIC_IntEnClear]
+ 198:	e58c0014 	str	r0, [ip, #20]
+	MOV	R0, R0, LSR #16			@ Unmask all interrupt levels
+ 19c:	e1a00820 	lsr	r0, r0, #16
+	STR	R0, [IP, #VIC_SWPriorityMask]
+ 1a0:	e58c0024 	str	r0, [ip, #36]
+	MOV	R0, #1				@ Enable protection
+ 1a4:	e3a00001 	mov	r0, #1	; 0x1
+	STR	R0, [IP, #VIC_Protection]
+ 1a8:	e58c0020 	str	r0, [ip, #32]
+	STR	R0, [IP, #VIC_VectAddr]		@ Issule EOI command
+ 1ac:	e58c0f00 	str	r0, [ip, #3840]
+	MOVS	PC, LR
+ 1b0:	e1b0f00e 	movs	pc, lr
+
+000001b4 <RegVect>:
+
+RegVect:
+	CMP	R0, #32				@ Range check
+ 1b4:	e3500020 	cmp	r0, #32	; 0x20
+	MOVCSS	PC, LR
+ 1b8:	21b0f00e 	movscs	pc, lr
+	LDR	IP, =(LPC_BASE_VIC+VIC_VectAddr0)
+ 1bc:	e59fc204 	ldr	ip, [pc, #516]	; 3c8 <sb_align+0x38>
+	STR	R1, [IP, R0, LSL #2]		@ Set VICVectVectAddr<n>
+ 1c0:	e78c1100 	str	r1, [ip, r0, lsl #2]
+	LDR	IP, =(LPC_BASE_VIC+VIC_VectPriority0)
+ 1c4:	e59fc200 	ldr	ip, [pc, #512]	; 3cc <sb_align+0x3c>
+	STR	R2, [IP, R0, LSL #2]		@ Set VICVectPriority<n>
+ 1c8:	e78c2100 	str	r2, [ip, r0, lsl #2]
+	MOV	R1, #1
+ 1cc:	e3a01001 	mov	r1, #1	; 0x1
+	MOV	R1, R1, LSL R0
+ 1d0:	e1a01011 	lsl	r1, r1, r0
+	LDR	IP, =LPC_BASE_VIC
+ 1d4:	e59fc1e8 	ldr	ip, [pc, #488]	; 3c4 <sb_align+0x34>
+	LDR	R2, [IP, #VIC_IntSelect]	@ Set corresponding bit in the VICIntSelect
+ 1d8:	e59c200c 	ldr	r2, [ip, #12]
+	BIC	R2, R1
+ 1dc:	e1c22001 	bic	r2, r2, r1
+	CMP	R3, #1
+ 1e0:	e3530001 	cmp	r3, #1	; 0x1
+	ORREQ	R2, R1
+ 1e4:	01822001 	orreq	r2, r2, r1
+	STR	R2, [IP, #VIC_IntSelect]
+ 1e8:	e58c200c 	str	r2, [ip, #12]
+	STR	R1, [IP, #VIC_IntEnable]	@ Enable corresponding interrupt
+ 1ec:	e58c1010 	str	r1, [ip, #16]
+	MOVS	PC, LR
+ 1f0:	e1b0f00e 	movs	pc, lr
+
+000001f4 <IrqDisable>:
+
+.global IrqDisable
+IrqDisable:
+	SWI	SWI_IRQ_DIS
+ 1f4:	ef000000 	svc	0x00000000
+	BX	LR
+ 1f8:	e12fff1e 	bx	lr
+
+000001fc <IrqEnable>:
+
+.global IrqEnable
+IrqEnable:
+	SWI	SWI_IRQ_EN
+ 1fc:	ef000001 	svc	0x00000001
+	BX	LR
+ 200:	e12fff1e 	bx	lr
+
+00000204 <FiqDisable>:
+
+.global FiqDisable
+FiqDisable:
+	SWI	SWI_FIQ_DIS
+ 204:	ef000002 	svc	0x00000002
+	BX	LR
+ 208:	e12fff1e 	bx	lr
+
+0000020c <FiqEnable>:
+
+.global FiqEnable
+FiqEnable:
+	SWI	SWI_FIQ_EN
+ 20c:	ef000003 	svc	0x00000003
+	BX	LR
+ 210:	e12fff1e 	bx	lr
+
+00000214 <ClearVector>:
+
+.global ClearVector
+ClearVector:
+	SWI	SWI_CLR_VECT
+ 214:	ef000004 	svc	0x00000004
+	BX	LR
+ 218:	e12fff1e 	bx	lr
+
+0000021c <RegisterVector>:
+
+.global RegisterVector
+RegisterVector:
+	SWI	SWI_REG_VECT
+ 21c:	ef000005 	svc	0x00000005
+	BX	LR
+ 220:	e12fff1e 	bx	lr
+
+00000224 <StartTask>:
+.section .text, "ax"
+.arm
+
+.global StartTask
+StartTask:
+	STR	R1, [R0, #60]		@ Set start address
+ 224:	e580103c 	str	r1, [r0, #60]
+	STR	R2, [R0, #56]		@ Set stack pointer
+ 228:	e5802038 	str	r2, [r0, #56]
+	MOV	R1, #1			@ Set task state
+ 22c:	e3a01001 	mov	r1, #1	; 0x1
+	STR	R1, [R0]
+ 230:	e5801000 	str	r1, [r0]
+	BX	LR
+ 234:	e12fff1e 	bx	lr
+
+00000238 <DispatchTask>:
+
+.global DispatchTask
+DispatchTask:
+	LDR	R1, [R0, #0]		@ Skip if task is absent
+ 238:	e5901000 	ldr	r1, [r0]
+	CMP	R1, #0
+ 23c:	e3510000 	cmp	r1, #0	; 0x0
+	BXEQ	LR
+ 240:	012fff1e 	bxeq	lr
+	LDR	R1, [R0, #4]		@ Skip if task in in sleep state
+ 244:	e5901004 	ldr	r1, [r0, #4]
+	CMP	R1, #0
+ 248:	e3510000 	cmp	r1, #0	; 0x0
+	BXNE	LR
+ 24c:	112fff1e 	bxne	lr
+
+	STMFD	SP!, {R4-R11,LR}	@ Save current state
+ 250:	e92d4ff0 	push	{r4, r5, r6, r7, r8, r9, sl, fp, lr}
+	LDR	IP, =CurrentTask
+ 254:	e59fc174 	ldr	ip, [pc, #372]	; 3d0 <sb_align+0x40>
+	STR	R0, [IP]
+ 258:	e58c0000 	str	r0, [ip]
+	STR	SP, [IP, #4]
+ 25c:	e58cd004 	str	sp, [ip, #4]
+	ADD	R0, R0, #24		@ Load working regs
+ 260:	e2800018 	add	r0, r0, #24	; 0x18
+	LDMFD	R0!, {R4-R11,SP,LR}
+ 264:	e8b06ff0 	ldm	r0!, {r4, r5, r6, r7, r8, r9, sl, fp, sp, lr}
+	BX	LR			@ Continue task
+ 268:	e12fff1e 	bx	lr
+
+0000026c <Sleep>:
+
+.global Sleep
+Sleep:
+	LDR	IP, =CurrentTask	@ Get current task object
+ 26c:	e59fc15c 	ldr	ip, [pc, #348]	; 3d0 <sb_align+0x40>
+	LDR	R1, [IP]
+ 270:	e59c1000 	ldr	r1, [ip]
+	STR	R0, [R1, #4]		@ Set task sleep timer
+ 274:	e5810004 	str	r0, [r1, #4]
+	ADD	R0, R1, #64		@ Save working regs
+ 278:	e2810040 	add	r0, r1, #64	; 0x40
+	STMFD	R0!, {R4-R11,SP,LR}
+ 27c:	e9206ff0 	stmdb	r0!, {r4, r5, r6, r7, r8, r9, sl, fp, sp, lr}
+	LDR	SP, [IP, #4]		@ Rerurn to manager
+ 280:	e59cd004 	ldr	sp, [ip, #4]
+	LDMFD	SP!, {R4-R11,LR}
+ 284:	e8bd4ff0 	pop	{r4, r5, r6, r7, r8, r9, sl, fp, lr}
+	BX	LR
+ 288:	e12fff1e 	bx	lr
+
+0000028c <Load_Block>:
+@-----------------------------------------------------------@
+
+.global Load_Block
+.arm
+Load_Block:
+	STMFD	SP!, {R4-R8}
+ 28c:	e92d01f0 	push	{r4, r5, r6, r7, r8}
+	ANDS	IP, R1, #3
+ 290:	e211c003 	ands	ip, r1, #3	; 0x3
+	BEQ	lb_align
+ 294:	0a000012 	beq	2e4 <lb_align>
+
+	BIC	R1, #3
+ 298:	e3c11003 	bic	r1, r1, #3	; 0x3
+	MOV	IP, IP, LSL #3
+ 29c:	e1a0c18c 	lsl	ip, ip, #3
+	RSB	R8, IP, #32
+ 2a0:	e26c8020 	rsb	r8, ip, #32	; 0x20
+	LDMIA	R1!, {R7}
+ 2a4:	e8b10080 	ldm	r1!, {r7}
+
+000002a8 <lb_l1>:
+lb_l1:	MOV	R3, R7
+ 2a8:	e1a03007 	mov	r3, r7
+	LDMIA	R1!, {R4-R7}
+ 2ac:	e8b100f0 	ldm	r1!, {r4, r5, r6, r7}
+	MOV	R3, R3, LSR IP
+ 2b0:	e1a03c33 	lsr	r3, r3, ip
+	ORR	R3, R3, R4, LSL R8
+ 2b4:	e1833814 	orr	r3, r3, r4, lsl r8
+	MOV	R4, R4, LSR IP
+ 2b8:	e1a04c34 	lsr	r4, r4, ip
+	ORR	R4, R4, R5, LSL R8
+ 2bc:	e1844815 	orr	r4, r4, r5, lsl r8
+	MOV	R5, R5, LSR IP
+ 2c0:	e1a05c35 	lsr	r5, r5, ip
+	ORR	R5, R5, R6, LSL R8
+ 2c4:	e1855816 	orr	r5, r5, r6, lsl r8
+	MOV	R6, R6, LSR IP
+ 2c8:	e1a06c36 	lsr	r6, r6, ip
+	ORR	R6, R6, R7, LSL R8
+ 2cc:	e1866817 	orr	r6, r6, r7, lsl r8
+	SUBS	R2, R2, #16
+ 2d0:	e2522010 	subs	r2, r2, #16	; 0x10
+	STMIA	R0!, {R3-R6}
+ 2d4:	e8a00078 	stmia	r0!, {r3, r4, r5, r6}
+	BNE	lb_l1
+ 2d8:	1afffff2 	bne	2a8 <lb_l1>
+	LDMFD	SP!, {R4-R8}
+ 2dc:	e8bd01f0 	pop	{r4, r5, r6, r7, r8}
+	BX	LR
+ 2e0:	e12fff1e 	bx	lr
+
+000002e4 <lb_align>:
+
+lb_align:
+	LDMIA	R1!, {R3-R6}
+ 2e4:	e8b10078 	ldm	r1!, {r3, r4, r5, r6}
+	SUBS	R2, R2, #16
+ 2e8:	e2522010 	subs	r2, r2, #16	; 0x10
+	STMIA	R0!, {R3-R6}
+ 2ec:	e8a00078 	stmia	r0!, {r3, r4, r5, r6}
+	BNE	lb_align
+ 2f0:	1afffffb 	bne	2e4 <lb_align>
+	LDMFD	SP!, {R4-R8}
+ 2f4:	e8bd01f0 	pop	{r4, r5, r6, r7, r8}
+	BX	LR
+ 2f8:	e12fff1e 	bx	lr
+
+000002fc <Store_Block>:
+
+
+.global Store_Block
+.arm
+Store_Block:
+	STMFD	SP!, {R4-R8}
+ 2fc:	e92d01f0 	push	{r4, r5, r6, r7, r8}
+	ANDS	IP, R0, #3
+ 300:	e210c003 	ands	ip, r0, #3	; 0x3
+	BEQ	sb_align
+ 304:	0a000021 	beq	390 <sb_align>
+
+	MOV	IP, IP, LSL #3
+ 308:	e1a0c18c 	lsl	ip, ip, #3
+	RSB	R8, IP, #32
+ 30c:	e26c8020 	rsb	r8, ip, #32	; 0x20
+
+	LDMIA	R1!, {R4-R7}
+ 310:	e8b100f0 	ldm	r1!, {r4, r5, r6, r7}
+
+00000314 <sb_p1>:
+sb_p1:	STRB	R4, [R0], #1
+ 314:	e4c04001 	strb	r4, [r0], #1
+	MOV	R4, R4, LSR #8
+ 318:	e1a04424 	lsr	r4, r4, #8
+	TST	R0, #3
+ 31c:	e3100003 	tst	r0, #3	; 0x3
+	BNE	sb_p1
+ 320:	1afffffb 	bne	314 <sb_p1>
+	ORR	R4, R4, R5, LSL IP
+ 324:	e1844c15 	orr	r4, r4, r5, lsl ip
+	MOV	R5, R5, LSR R8
+ 328:	e1a05835 	lsr	r5, r5, r8
+	ORR	R5, R5, R6, LSL IP
+ 32c:	e1855c16 	orr	r5, r5, r6, lsl ip
+	MOV	R6, R6, LSR R8
+ 330:	e1a06836 	lsr	r6, r6, r8
+	ORR	R6, R6, R7, LSL IP
+ 334:	e1866c17 	orr	r6, r6, r7, lsl ip
+	SUBS	R2, R2, #16
+ 338:	e2522010 	subs	r2, r2, #16	; 0x10
+	STMIA	R0!, {R4-R6}
+ 33c:	e8a00070 	stmia	r0!, {r4, r5, r6}
+
+00000340 <sb_l1>:
+
+sb_l1:	MOV	R3, R7
+ 340:	e1a03007 	mov	r3, r7
+	LDMIA	R1!, {R4-R7}
+ 344:	e8b100f0 	ldm	r1!, {r4, r5, r6, r7}
+	MOV	R3, R3, LSR R8
+ 348:	e1a03833 	lsr	r3, r3, r8
+	ORR	R3, R3, R4, LSL IP
+ 34c:	e1833c14 	orr	r3, r3, r4, lsl ip
+	MOV	R4, R4, LSR R8
+ 350:	e1a04834 	lsr	r4, r4, r8
+	ORR	R4, R4, R5, LSL IP
+ 354:	e1844c15 	orr	r4, r4, r5, lsl ip
+	MOV	R5, R5, LSR R8
+ 358:	e1a05835 	lsr	r5, r5, r8
+	ORR	R5, R5, R6, LSL IP
+ 35c:	e1855c16 	orr	r5, r5, r6, lsl ip
+	MOV	R6, R6, LSR R8
+ 360:	e1a06836 	lsr	r6, r6, r8
+	ORR	R6, R6, R7, LSL IP
+ 364:	e1866c17 	orr	r6, r6, r7, lsl ip
+	SUBS	R2, R2, #16
+ 368:	e2522010 	subs	r2, r2, #16	; 0x10
+	STMIA	R0!, {R3-R6}
+ 36c:	e8a00078 	stmia	r0!, {r3, r4, r5, r6}
+	BNE	sb_l1
+ 370:	1afffff2 	bne	340 <sb_l1>
+
+	MOV	R7, R7, LSR R8
+ 374:	e1a07837 	lsr	r7, r7, r8
+
+00000378 <sb_p2>:
+sb_p2:	SUBS	IP, IP, #8
+ 378:	e25cc008 	subs	ip, ip, #8	; 0x8
+	STRB	R7, [R0], #1
+ 37c:	e4c07001 	strb	r7, [r0], #1
+	MOV	R7, R7, LSR #8
+ 380:	e1a07427 	lsr	r7, r7, #8
+	BNE	sb_p2
+ 384:	1afffffb 	bne	378 <sb_p2>
+
+	LDMFD	SP!, {R4-R8}
+ 388:	e8bd01f0 	pop	{r4, r5, r6, r7, r8}
+	BX	LR
+ 38c:	e12fff1e 	bx	lr
+
+00000390 <sb_align>:
+
+sb_align:
+	LDMIA	R1!, {R3-R6}
+ 390:	e8b10078 	ldm	r1!, {r3, r4, r5, r6}
+	SUBS	R2, #16
+ 394:	e2522010 	subs	r2, r2, #16	; 0x10
+	STMIA	R0!, {R3-R6}
+ 398:	e8a00078 	stmia	r0!, {r3, r4, r5, r6}
+	BNE	sb_align
+ 39c:	1afffffb 	bne	390 <sb_align>
+	LDMFD	SP!, {R4-R8}
+ 3a0:	e8bd01f0 	pop	{r4, r5, r6, r7, r8}
+	BX	LR
+ 3a4:	e12fff1e 	bx	lr
+ 3a8:	40000a10 	.word	0x40000a10
+ 3ac:	0000067c 	.word	0x0000067c
+ 3b0:	40000000 	.word	0x40000000
+ 3b4:	40000004 	.word	0x40000004
+ 3b8:	40000004 	.word	0x40000004
+ 3bc:	4000000c 	.word	0x4000000c
+ 3c0:	000004b8 	.word	0x000004b8
+ 3c4:	fffff000 	.word	0xfffff000
+ 3c8:	fffff100 	.word	0xfffff100
+ 3cc:	fffff200 	.word	0xfffff200
+ 3d0:	40000004 	.word	0x40000004
+
+000003d4 <Isr_TIMER0>:
+/*__irq __arm void IRQ_Handler()*/
+/*******************************************************/
+
+void Isr_TIMER0 (void)
+{
+	g_i++;
+ 3d4:	e59f2018 	ldr	r2, [pc, #24]	; 3f4 <Isr_TIMER0+0x20>
+ 3d8:	e5923000 	ldr	r3, [r2]
+ 3dc:	e2833001 	add	r3, r3, #1	; 0x1
+ 3e0:	e5823000 	str	r3, [r2]
+//	FIO1PIN^=0x00040000;
+	T0IR = 1;
+ 3e4:	e59f300c 	ldr	r3, [pc, #12]	; 3f8 <Isr_TIMER0+0x24>
+ 3e8:	e3a02001 	mov	r2, #1	; 0x1
+ 3ec:	e5832000 	str	r2, [r3]
+}
+ 3f0:	e12fff1e 	bx	lr
+ 3f4:	40000000 	.word	0x40000000
+ 3f8:	e0004000 	.word	0xe0004000
+
+000003fc <Delay_ms>:
+
+void Delay_ms(int mCount)
+{
+	g_i=0;
+ 3fc:	e59f3010 	ldr	r3, [pc, #16]	; 414 <Delay_ms+0x18>
+ 400:	e3a02000 	mov	r2, #0	; 0x0
+	while(g_i!=mCount);
+ 404:	e3500000 	cmp	r0, #0	; 0x0
+	T0IR = 1;
+}
+
+void Delay_ms(int mCount)
+{
+	g_i=0;
+ 408:	e5832000 	str	r2, [r3]
+	while(g_i!=mCount);
+ 40c:	012fff1e 	bxeq	lr
+ 410:	eafffffe 	b	410 <Delay_ms+0x14>
+ 414:	40000000 	.word	0x40000000
+
+00000418 <ymzwrite0>:
+}
+void Delay(volatile unsigned long nCount)
+{
+	for(; nCount != 0; nCount--);
+}
+void ymzwrite0(int frec,int adr){
+ 418:	e92d01f0 	push	{r4, r5, r6, r7, r8}
+		FIO4PIN=0x200+adr;
+		FIO4PIN=0x100+(frec&0xFF);
+		FIO4PIN=0x300+(frec&0xFF);
+		FIO4PIN=adr+1;
+		FIO4PIN=0x201+adr;
+		highbyte=(frec>>8)&0xFF;
+ 41c:	e1a04440 	asr	r4, r0, #8
+{
+	for(; nCount != 0; nCount--);
+}
+void ymzwrite0(int frec,int adr){
+int highbyte;
+		FIO4PIN=0x00;
+ 420:	e59f2054 	ldr	r2, [pc, #84]	; 47c <ymzwrite0+0x64>
+		FIO4PIN=adr;
+		FIO4PIN=0x200+adr;
+		FIO4PIN=0x100+(frec&0xFF);
+ 424:	e20000ff 	and	r0, r0, #255	; 0xff
+		FIO4PIN=0x300+(frec&0xFF);
+		FIO4PIN=adr+1;
+		FIO4PIN=0x201+adr;
+		highbyte=(frec>>8)&0xFF;
+		FIO4PIN=0x100+highbyte;
+ 428:	e204c0ff 	and	ip, r4, #255	; 0xff
+		FIO4PIN=adr;
+		FIO4PIN=0x200+adr;
+		FIO4PIN=0x100+(frec&0xFF);
+		FIO4PIN=0x300+(frec&0xFF);
+		FIO4PIN=adr+1;
+		FIO4PIN=0x201+adr;
+ 42c:	e2815c02 	add	r5, r1, #512	; 0x200
+int highbyte;
+		FIO4PIN=0x00;
+		FIO4PIN=adr;
+		FIO4PIN=0x200+adr;
+		FIO4PIN=0x100+(frec&0xFF);
+		FIO4PIN=0x300+(frec&0xFF);
+ 430:	e2808c03 	add	r8, r0, #768	; 0x300
+		FIO4PIN=adr+1;
+		FIO4PIN=0x201+adr;
+ 434:	e2855001 	add	r5, r5, #1	; 0x1
+		highbyte=(frec>>8)&0xFF;
+		FIO4PIN=0x100+highbyte;
+ 438:	e28ccc01 	add	ip, ip, #256	; 0x100
+		FIO4PIN=0x300+(frec>>8);
+ 43c:	e2844c03 	add	r4, r4, #768	; 0x300
+}
+void ymzwrite0(int frec,int adr){
+int highbyte;
+		FIO4PIN=0x00;
+		FIO4PIN=adr;
+		FIO4PIN=0x200+adr;
+ 440:	e2816c02 	add	r6, r1, #512	; 0x200
+		FIO4PIN=0x100+(frec&0xFF);
+ 444:	e2800c01 	add	r0, r0, #256	; 0x100
+		FIO4PIN=0x300+(frec&0xFF);
+		FIO4PIN=adr+1;
+ 448:	e2817001 	add	r7, r1, #1	; 0x1
+{
+	for(; nCount != 0; nCount--);
+}
+void ymzwrite0(int frec,int adr){
+int highbyte;
+		FIO4PIN=0x00;
+ 44c:	e3a03000 	mov	r3, #0	; 0x0
+ 450:	e5023f6b 	str	r3, [r2, #-3947]
+		FIO4PIN=adr;
+ 454:	e5021f6b 	str	r1, [r2, #-3947]
+		FIO4PIN=0x200+adr;
+ 458:	e5026f6b 	str	r6, [r2, #-3947]
+		FIO4PIN=0x100+(frec&0xFF);
+ 45c:	e5020f6b 	str	r0, [r2, #-3947]
+		FIO4PIN=0x300+(frec&0xFF);
+ 460:	e5028f6b 	str	r8, [r2, #-3947]
+		FIO4PIN=adr+1;
+ 464:	e5027f6b 	str	r7, [r2, #-3947]
+		FIO4PIN=0x201+adr;
+ 468:	e5025f6b 	str	r5, [r2, #-3947]
+		highbyte=(frec>>8)&0xFF;
+		FIO4PIN=0x100+highbyte;
+ 46c:	e502cf6b 	str	ip, [r2, #-3947]
+		FIO4PIN=0x300+(frec>>8);
+ 470:	e5024f6b 	str	r4, [r2, #-3947]
+		
+}
+ 474:	e8bd01f0 	pop	{r4, r5, r6, r7, r8}
+ 478:	e12fff1e 	bx	lr
+ 47c:	3fffcfff 	.word	0x3fffcfff
+
+00000480 <ymzwrite1>:
+void ymzwrite1(int value,int adr){
+		FIO4PIN=0x00;
+ 480:	e59f202c 	ldr	r2, [pc, #44]	; 4b4 <ymzwrite1+0x34>
+		highbyte=(frec>>8)&0xFF;
+		FIO4PIN=0x100+highbyte;
+		FIO4PIN=0x300+(frec>>8);
+		
+}
+void ymzwrite1(int value,int adr){
+ 484:	e52d4004 	push	{r4}		; (str r4, [sp, #-4]!)
+		FIO4PIN=0x00;
+		FIO4PIN=adr;
+		FIO4PIN=(0x200+adr);
+ 488:	e281cc02 	add	ip, r1, #512	; 0x200
+		FIO4PIN=(0x100+value);
+		FIO4PIN=(0x300+value);
+ 48c:	e2804c03 	add	r4, r0, #768	; 0x300
+		FIO4PIN=0x100+highbyte;
+		FIO4PIN=0x300+(frec>>8);
+		
+}
+void ymzwrite1(int value,int adr){
+		FIO4PIN=0x00;
+ 490:	e3a03000 	mov	r3, #0	; 0x0
+		FIO4PIN=adr;
+		FIO4PIN=(0x200+adr);
+		FIO4PIN=(0x100+value);
+ 494:	e2800c01 	add	r0, r0, #256	; 0x100
+		FIO4PIN=0x100+highbyte;
+		FIO4PIN=0x300+(frec>>8);
+		
+}
+void ymzwrite1(int value,int adr){
+		FIO4PIN=0x00;
+ 498:	e5023f6b 	str	r3, [r2, #-3947]
+		FIO4PIN=adr;
+ 49c:	e5021f6b 	str	r1, [r2, #-3947]
+		FIO4PIN=(0x200+adr);
+ 4a0:	e502cf6b 	str	ip, [r2, #-3947]
+		FIO4PIN=(0x100+value);
+ 4a4:	e5020f6b 	str	r0, [r2, #-3947]
+		FIO4PIN=(0x300+value);
+ 4a8:	e5024f6b 	str	r4, [r2, #-3947]
+//		Delay(10);
+}
+ 4ac:	e8bd0010 	pop	{r4}
+ 4b0:	e12fff1e 	bx	lr
+ 4b4:	3fffcfff 	.word	0x3fffcfff
+
+000004b8 <main>:
+//----------------------------------------------------------------------------
+
+int main(void)
+{
+ 4b8:	e92d41f0 	push	{r4, r5, r6, r7, r8, lr}
+	SCS = SCS | 1;    //FGPIO Select
+ 4bc:	e59f40fc 	ldr	r4, [pc, #252]	; 5c0 <main+0x108>
+ 4c0:	e59431a0 	ldr	r3, [r4, #416]
+ 4c4:	e3833001 	orr	r3, r3, #1	; 0x1
+	set_pll();
+	VICIntSelect = 0;	//�S�Ă̊��荞�݂�FIQ�ł͂Ȃ�IRQ�ɂ���
+	T0PR  =  0x00000000;	/* �v���X�P�[������  */
+ 4c8:	e59f50f4 	ldr	r5, [pc, #244]	; 5c4 <main+0x10c>
+}
+//----------------------------------------------------------------------------
+
+int main(void)
+{
+	SCS = SCS | 1;    //FGPIO Select
+ 4cc:	e58431a0 	str	r3, [r4, #416]
+	set_pll();
+ 4d0:	eb000040 	bl	5d8 <set_pll>
+	VICIntSelect = 0;	//�S�Ă̊��荞�݂�FIQ�ł͂Ȃ�IRQ�ɂ���
+ 4d4:	e3a06000 	mov	r6, #0	; 0x0
+	T0PR  =  0x00000000;	/* �v���X�P�[������  */
+	PCLKSEL1=0x00000004; /*TIMER0��CPU���x��*/
+ 4d8:	e3a0c004 	mov	ip, #4	; 0x4
+
+int main(void)
+{
+	SCS = SCS | 1;    //FGPIO Select
+	set_pll();
+	VICIntSelect = 0;	//�S�Ă̊��荞�݂�FIQ�ł͂Ȃ�IRQ�ɂ���
+ 4dc:	e3e07000 	mvn	r7, #0	; 0x0
+ 4e0:	e5076ff3 	str	r6, [r7, #-4083]
+	T0MCR =  0x00000003;	/* Match����TC�N���A & ���荞�� */
+
+	/* VIC�Ɋ��荞�݋����w������        */
+	VICIntEnable = TIMER0_INT_BIT;
+
+	RegisterVector(TIMER0_INT, Isr_TIMER0, PRI_LOWEST, CLASS_IRQ);
+ 4e4:	e1a0000c 	mov	r0, ip
+int main(void)
+{
+	SCS = SCS | 1;    //FGPIO Select
+	set_pll();
+	VICIntSelect = 0;	//�S�Ă̊��荞�݂�FIQ�ł͂Ȃ�IRQ�ɂ���
+	T0PR  =  0x00000000;	/* �v���X�P�[������  */
+ 4e8:	e585600c 	str	r6, [r5, #12]
+	PCLKSEL1=0x00000004; /*TIMER0��CPU���x��*/
+ 4ec:	e584c1ac 	str	ip, [r4, #428]
+	T0MR0 =  72000000;	/*0.1ms=1C20*/
+ 4f0:	e59fc0d0 	ldr	ip, [pc, #208]	; 5c8 <main+0x110>
+ 4f4:	e585c018 	str	ip, [r5, #24]
+	T0MCR =  0x00000003;	/* Match����TC�N���A & ���荞�� */
+ 4f8:	e3a0c003 	mov	ip, #3	; 0x3
+ 4fc:	e585c014 	str	ip, [r5, #20]
+
+	/* VIC�Ɋ��荞�݋����w������        */
+	VICIntEnable = TIMER0_INT_BIT;
+ 500:	e28cc00d 	add	ip, ip, #13	; 0xd
+ 504:	e507cfef 	str	ip, [r7, #-4079]
+
+	RegisterVector(TIMER0_INT, Isr_TIMER0, PRI_LOWEST, CLASS_IRQ);
+ 508:	e3a0200f 	mov	r2, #15	; 0xf
+ 50c:	e1a03006 	mov	r3, r6
+ 510:	e59f10b4 	ldr	r1, [pc, #180]	; 5cc <main+0x114>
+ 514:	ebffff40 	bl	21c <RegisterVector>
+
+	IrqEnable();
+ 518:	ebffff37 	bl	1fc <IrqEnable>
+
+	/* �^�C�}�X�^�[�g                     */
+	T0TCR = 1;
+ 51c:	e3a03001 	mov	r3, #1	; 0x1
+
+
+//	Delay_ms(100);
+	FIO4DIR = 0x3FF;
+ 520:	e59f20a8 	ldr	r2, [pc, #168]	; 5d0 <main+0x118>
+	RegisterVector(TIMER0_INT, Isr_TIMER0, PRI_LOWEST, CLASS_IRQ);
+
+	IrqEnable();
+
+	/* �^�C�}�X�^�[�g                     */
+	T0TCR = 1;
+ 524:	e5853004 	str	r3, [r5, #4]
+
+
+//	Delay_ms(100);
+	FIO4DIR = 0x3FF;
+ 528:	e59f30a4 	ldr	r3, [pc, #164]	; 5d4 <main+0x11c>
+ 52c:	e5023f7f 	str	r3, [r2, #-3967]
+	FIO1DIR = 0x40000;
+ 530:	e3a03701 	mov	r3, #262144	; 0x40000
+ 534:	e5023fdf 	str	r3, [r2, #-4063]
+	ymzwrite1(0x3E,0);
+ 538:	e3a0003e 	mov	r0, #62	; 0x3e
+ 53c:	e1a01006 	mov	r1, r6
+ 540:	ebffffce 	bl	480 <ymzwrite1>
+	ymzwrite1(0x1F,0);
+ 544:	e3a0001f 	mov	r0, #31	; 0x1f
+ 548:	e1a01006 	mov	r1, r6
+ 54c:	ebffffcb 	bl	480 <ymzwrite1>
+	ymzwrite1(0xF,0x8);
+ 550:	e3a0000f 	mov	r0, #15	; 0xf
+ 554:	e3a01008 	mov	r1, #8	; 0x8
+ 558:	ebffffc8 	bl	480 <ymzwrite1>
+	ymzwrite1(0x1F,0xF);
+ 55c:	e3a0001f 	mov	r0, #31	; 0x1f
+ 560:	e3a0100f 	mov	r1, #15	; 0xf
+ 564:	ebffffc5 	bl	480 <ymzwrite1>
+	ymzwrite0(568,0);
+ 568:	e1a01006 	mov	r1, r6
+ 56c:	e3a00f8e 	mov	r0, #568	; 0x238
+ 570:	ebffffa8 	bl	418 <ymzwrite0>
+	ymzwrite0(1136,2);
+ 574:	e3a00e47 	mov	r0, #1136	; 0x470
+ 578:	e3a01002 	mov	r1, #2	; 0x2
+ 57c:	ebffffa5 	bl	418 <ymzwrite0>
+	ymzwrite0(0xF00,11);
+ 580:	e3a00c0f 	mov	r0, #3840	; 0xf00
+ 584:	e3a0100b 	mov	r1, #11	; 0xb
+ 588:	ebffffa2 	bl	418 <ymzwrite0>
+	ymzwrite1(0x8,13);
+ 58c:	e3a00008 	mov	r0, #8	; 0x8
+ 590:	e3a0100d 	mov	r1, #13	; 0xd
+ 594:	ebffffb9 	bl	480 <ymzwrite1>
+
+	while(1){
+		Delay_ms(1);
+ 598:	e3a00001 	mov	r0, #1	; 0x1
+		FIO1PIN=0;
+ 59c:	e59f402c 	ldr	r4, [pc, #44]	; 5d0 <main+0x118>
+	ymzwrite0(1136,2);
+	ymzwrite0(0xF00,11);
+	ymzwrite1(0x8,13);
+
+	while(1){
+		Delay_ms(1);
+ 5a0:	ebffff95 	bl	3fc <Delay_ms>
+		FIO1PIN=0;
+ 5a4:	e3a03000 	mov	r3, #0	; 0x0
+ 5a8:	e5043fcb 	str	r3, [r4, #-4043]
+		Delay_ms(1000);
+ 5ac:	e3a00ffa 	mov	r0, #1000	; 0x3e8
+ 5b0:	ebffff91 	bl	3fc <Delay_ms>
+		FIO1PIN=0x40000;
+ 5b4:	e3a03701 	mov	r3, #262144	; 0x40000
+ 5b8:	e5043fcb 	str	r3, [r4, #-4043]
+ 5bc:	eafffff5 	b	598 <main+0xe0>
+ 5c0:	e01fc000 	.word	0xe01fc000
+ 5c4:	e0004000 	.word	0xe0004000
+ 5c8:	044aa200 	.word	0x044aa200
+ 5cc:	000003d4 	.word	0x000003d4
+ 5d0:	3fffcfff 	.word	0x3fffcfff
+ 5d4:	000003ff 	.word	0x000003ff
+
+000005d8 <set_pll>:
+#include"drv.h"
+#include"stdio.h"
+void set_pll()
+{
+	/* 1. もしPLLを使用しているなら、ディスコネクトし、フィード・シーケンスを踏む */
+    if ( PLLSTAT & (1 << 25) )
+ 5d8:	e59f2098 	ldr	r2, [pc, #152]	; 678 <set_pll+0xa0>
+ 5dc:	e5923088 	ldr	r3, [r2, #136]
+ 5e0:	e3130402 	tst	r3, #33554432	; 0x2000000
+ 5e4:	0a000005 	beq	600 <set_pll+0x28>
+    {
+    	PLLCON = 1;				/* Keep PLL Enable disconnected */
+ 5e8:	e3a03001 	mov	r3, #1	; 0x1
+ 5ec:	e5823080 	str	r3, [r2, #128]
+    	PLLFEED = 0xAA;
+ 5f0:	e28330a9 	add	r3, r3, #169	; 0xa9
+ 5f4:	e582308c 	str	r3, [r2, #140]
+    	PLLFEED = 0x55;
+ 5f8:	e3a03055 	mov	r3, #85	; 0x55
+ 5fc:	e582308c 	str	r3, [r2, #140]
+    }
+
+	/* 2. PLLをディセーブルし、フィード・シーケンスを踏む。 */
+	PLLCON = 0;		/* Disable PLL */
+ 600:	e59f3070 	ldr	r3, [pc, #112]	; 678 <set_pll+0xa0>
+ 604:	e3a02000 	mov	r2, #0	; 0x0
+	PLLFEED = 0xAA;
+ 608:	e3a010aa 	mov	r1, #170	; 0xaa
+	PLLFEED = 0x55;
+ 60c:	e3a00055 	mov	r0, #85	; 0x55
+    	PLLFEED = 0xAA;
+    	PLLFEED = 0x55;
+    }
+
+	/* 2. PLLをディセーブルし、フィード・シーケンスを踏む。 */
+	PLLCON = 0;		/* Disable PLL */
+ 610:	e5832080 	str	r2, [r3, #128]
+	PLLFEED = 0xAA;
+ 614:	e583108c 	str	r1, [r3, #140]
+	PLLFEED = 0x55;
+ 618:	e583008c 	str	r0, [r3, #140]
+
+	/* 3. CPUクロック・ディバイダの設定を、PLLなしでも遅くなりすぎないように設定する。 */
+	CCLKCFG = 0;	/* CCLK = PCLK / 1 */
+ 61c:	e5832104 	str	r2, [r3, #260]
+
+	/* 4. PLLのクロックソースを変更する。 */
+	CLKSRCSEL = 0;	/* Select 4MHz internal oscillator*/
+ 620:	e583210c 	str	r2, [r3, #268]
+
+	/* 5. PLLCFGへの書き込みを行い、フィード・シーケンスを踏んで有効化する。
+	 * PLLCFGは、PLLがディセーブルのときにだけ変更できる。 */
+	PLLCFG = 35;	/* Divide by 1, Multiply by 72, PCLK = 4*72 = 288MHz */
+ 624:	e2822023 	add	r2, r2, #35	; 0x23
+ 628:	e5832084 	str	r2, [r3, #132]
+	PLLFEED = 0xAA;
+	PLLFEED = 0x55;
+
+	/* 6. PLLをイネーブルにし、フィード・シーケンスを踏む. */
+	PLLCON = 1;		/* Enable PLL */
+ 62c:	e3a02001 	mov	r2, #1	; 0x1
+	CLKSRCSEL = 0;	/* Select 4MHz internal oscillator*/
+
+	/* 5. PLLCFGへの書き込みを行い、フィード・シーケンスを踏んで有効化する。
+	 * PLLCFGは、PLLがディセーブルのときにだけ変更できる。 */
+	PLLCFG = 35;	/* Divide by 1, Multiply by 72, PCLK = 4*72 = 288MHz */
+	PLLFEED = 0xAA;
+ 630:	e583108c 	str	r1, [r3, #140]
+	PLLFEED = 0x55;
+ 634:	e583008c 	str	r0, [r3, #140]
+
+	/* 6. PLLをイネーブルにし、フィード・シーケンスを踏む. */
+	PLLCON = 1;		/* Enable PLL */
+ 638:	e5832080 	str	r2, [r3, #128]
+	PLLFEED = 0xAA;
+	PLLFEED = 0x55;
+
+	/* 7. CPUクロック・ディバイダの値を、PLL動作用に変更する。
+	 * これは必ず、PLLをクロック源として接続する前に行う。 */
+	CCLKCFG = 3;	/* CCLK = PCLK/4 = 288/4 = 72MHz */
+ 63c:	e2822002 	add	r2, r2, #2	; 0x2
+	PLLFEED = 0xAA;
+	PLLFEED = 0x55;
+
+	/* 6. PLLをイネーブルにし、フィード・シーケンスを踏む. */
+	PLLCON = 1;		/* Enable PLL */
+	PLLFEED = 0xAA;
+ 640:	e583108c 	str	r1, [r3, #140]
+	PLLFEED = 0x55;
+ 644:	e583008c 	str	r0, [r3, #140]
+
+	/* 7. CPUクロック・ディバイダの値を、PLL動作用に変更する。
+	 * これは必ず、PLLをクロック源として接続する前に行う。 */
+	CCLKCFG = 3;	/* CCLK = PCLK/4 = 288/4 = 72MHz */
+ 648:	e5832104 	str	r2, [r3, #260]
+
+	/* 8. PLLSTATレジスタのPLOCK bitを調べて、PLLがロックするまで待つ。
+	 * あるいはPLOCK割り込みを使用してもいい。あるいは、PLLの入力クロックが小さい(32kHzなど)なら、
+	 * 単純にウェイト・ループを回してもいい。*/
+	while ( !(PLLSTAT & (1<<26)))
+ 64c:	e59f2024 	ldr	r2, [pc, #36]	; 678 <set_pll+0xa0>
+ 650:	e5923088 	ldr	r3, [r2, #136]
+ 654:	e3130301 	tst	r3, #67108864	; 0x4000000
+ 658:	0afffffb 	beq	64c <set_pll+0x74>
+		;
+
+	/* 9. PLLをシステムに接続し、フィードシーケンスを実行する */
+	PLLCON = 3;		/* Select PLL as CPU clock source */
+ 65c:	e3a03003 	mov	r3, #3	; 0x3
+ 660:	e5823080 	str	r3, [r2, #128]
+	PLLFEED = 0xAA;
+ 664:	e28330a7 	add	r3, r3, #167	; 0xa7
+ 668:	e582308c 	str	r3, [r2, #140]
+	PLLFEED = 0x55;
+ 66c:	e3a03055 	mov	r3, #85	; 0x55
+ 670:	e582308c 	str	r3, [r2, #140]
+
+}
+ 674:	e12fff1e 	bx	lr
+ 678:	e01fc000 	.word	0xe01fc000

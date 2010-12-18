@@ -1,0 +1,2 @@
+#/bin/bash
+/opt/lpc21isp/lpc21isp main.hex /dev/ttyUSB0 115200 4000

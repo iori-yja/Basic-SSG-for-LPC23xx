@@ -1,0 +1,110 @@
+#include "LPC23xx.h"
+#include "interrupt.h"
+
+/* ポートコントローラのレジスタ */
+#define GPIO_PINSEL1	((volatile unsigned int *)(0xE002C004))
+#define GPIO_PINMODE1	((volatile unsigned int *)(0xE002C044))
+
+
+/* 割り込みコントローラ(VIC)のレジスタ */
+#define TIMER0_INT_BIT  (0x00000010)
+
+void Delay(volatile unsigned long nCount);
+/* IRQ 割り込み処理 */
+/*__irq __arm void IRQ_Handler()*/
+void Isr_TIMER0 (void)
+{
+	static int led = 0;
+
+	if( led == 0 ) {
+		led = 1;
+		FIO1SET=0x40000;
+		FIO4SET=0x03;
+	} else {
+		led = 0;
+		FIO1CLR=0x40000;
+		FIO4CLR=0x0F;
+	}
+
+	T0IR = 1; /* MC0をクリア */
+}
+
+void set_pll()
+{
+	/* 1. もしPLLを使用しているなら、ディスコネクトし、フィード・シーケンスを踏む */
+    if ( PLLSTAT & (1 << 25) )
+    {
+    	PLLCON = 1;				/* Keep PLL Enable disconnected */
+    	PLLFEED = 0xAA;
+    	PLLFEED = 0x55;
+    }
+
+	/* 2. PLLをディセーブルし、フィード・シーケンスを踏む。 */
+	PLLCON = 0;		/* Disable PLL */
+	PLLFEED = 0xAA;
+	PLLFEED = 0x55;
+
+	/* 3. CPUクロック・ディバイダの設定を、PLLなしでも遅くなりすぎないように設定する。 */
+	CCLKCFG = 0;	/* CCLK = PCLK / 1 */
+
+	/* 4. PLLのクロックソースを変更する。 */
+	CLKSRCSEL = 0;	/* Select 4MHz internal oscillator*/
+
+	/* 5. PLLCFGへの書き込みを行い、フィード・シーケンスを踏んで有効化する。
+	 * PLLCFGは、PLLがディセーブルのときにだけ変更できる。 */
+	PLLCFG = 35;	/* Divide by 1, Multiply by 72, PCLK = 4*72 = 288MHz */
+	PLLFEED = 0xAA;
+	PLLFEED = 0x55;
+
+	/* 6. PLLをイネーブルにし、フィード・シーケンスを踏む. */
+	PLLCON = 1;		/* Enable PLL */
+	PLLFEED = 0xAA;
+	PLLFEED = 0x55;
+
+	/* 7. CPUクロック・ディバイダの値を、PLL動作用に変更する。
+	 * これは必ず、PLLをクロック源として接続する前に行う。 */
+	CCLKCFG = 3;	/* CCLK = PCLK/4 = 288/4 = 72MHz */
+
+	/* 8. PLLSTATレジスタのPLOCK bitを調べて、PLLがロックするまで待つ。
+	 * あるいはPLOCK割り込みを使用してもいい。あるいは、PLLの入力クロックが小さい(32kHzなど)なら、
+	 * 単純にウェイト・ループを回してもいい。*/
+	while ( !(PLLSTAT & (1<<26)))
+		;
+
+	/* 9. PLLをシステムに接続し、フィードシーケンスを実行する */
+	PLLCON = 3;		/* Select PLL as CPU clock source */
+	PLLFEED = 0xAA;
+	PLLFEED = 0x55;
+
+}
+void Delay(volatile unsigned long nCount)
+{
+	for(; nCount != 0; nCount--);
+}
+
+/* main関数 */
+int main(void)
+{
+	SCS = SCS | 1;    //FGPIO Select
+	set_pll();
+	FIO1DIR =0x00040000;	
+	FIO1MASK=0x00000000;
+	VICIntSelect = 0;	//全ての割り込みをFIQではなくIRQにする
+	FIO4DIR=0x0F;
+	FIO4MASK=0x0F;
+	T0PR = 0x00000000;      /* プリスケール無し  */
+	T0MR0 = 0x000F0000;
+	T0MCR = 0x00000003;      /* Match時にTCクリア & 割り込み */
+
+	/* VICに割り込み許可を指示する        */
+	VICIntEnable = TIMER0_INT_BIT;
+
+	RegisterVector(TIMER0_INT, Isr_TIMER0, PRI_LOWEST, CLASS_IRQ);
+
+	IrqEnable();
+
+	/* タイマスタート                     */
+	T0TCR = 1;
+
+	while(1);
+}
