@@ -5,7 +5,6 @@
 #define GPIO_PINSEL1	((volatile unsigned int *)(0xE002C004))
 #define GPIO_PINMODE1	((volatile unsigned int *)(0xE002C044))
 
-
 /* 割り込みコントローラ(VIC)のレジスタ */
 #define TIMER0_INT_BIT  (0x00000010)
 #define WRITTEN 10
