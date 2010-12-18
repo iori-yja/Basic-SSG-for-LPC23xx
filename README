@@ -1,0 +1,11 @@
+discription:
+I wrote this mainly for my use.
+So, Comments are often in Japanese, and perhaps there're waste routines for other purpose.
+If you're in trouble, ask me.
+
+Usage:
+ymzwrite(long|byte)(Data,address) in main.c is entity.
+ymzwritelong is for writing tone(0:2)
+
+drv.c is PLL driver, it has no use for driving for SSG.
+

@@ -32,7 +32,7 @@ void Delay(volatile unsigned long nCount)
 {
 	for(; nCount != 0; nCount--);
 }
-void ymzwrite0(int frec,int adr){
+void ymzwritelong(int frec,int adr){
 int highbyte;
 		FIO4PIN=0x00;
 		FIO4PIN=adr;
@@ -46,13 +46,12 @@ int highbyte;
 		FIO4PIN=0x300+(frec>>8);
 		
 }
-void ymzwrite1(int value,int adr){
+void ymzwritebyte(int value,int adr){
 		FIO4PIN=0x00;
 		FIO4PIN=adr;
 		FIO4PIN=(0x200+adr);
 		FIO4PIN=(0x100+value);
 		FIO4PIN=(0x300+value);
-//		Delay(10);
 }
 //----------------------------------------------------------------------------
 
@@ -65,34 +64,30 @@ int main(void)
 	PCLKSEL1=0x00000004; /*TIMER0をCPU速度で*/
 	T0MR0 =  72000000;	/*0.1ms=1C20*/
 	T0MCR =  0x00000003;	/* Match時にTCクリア & 割り込み */
-
 	/* VICに割り込み許可を指示する        */
 	VICIntEnable = TIMER0_INT_BIT;
-
 	RegisterVector(TIMER0_INT, Isr_TIMER0, PRI_LOWEST, CLASS_IRQ);
-
 	IrqEnable();
-
 	/* タイマスタート                     */
 	T0TCR = 1;
 
 
-//	Delay_ms(100);
 	FIO4DIR = 0x3FF;
 	FIO1DIR = 0x40000;
-	ymzwrite1(0x3E,0);
-	ymzwrite1(0x1F,0);
-	ymzwrite1(0xF,0x8);
-	ymzwrite1(0x1F,0xF);
-	ymzwrite0(568,0);
-	ymzwrite0(1136,2);
-	ymzwrite0(0xF00,11);
-	ymzwrite1(0x8,13);
+	ymzwritebyte(0x3E,0);
+	ymzwritebyte(0x1F,0);
+	ymzwritebyte(0xF,0x8);
+	ymzwritebyte(0x1F,0xF);
+	ymzwritelong(568,0);
+	ymzwritelong(1136,2);
+	ymzwritelong(0xF00,11);
+	ymzwritebyte(0x8,13);
 
 	while(1){
 		Delay_ms(1);
 		FIO1PIN=0;
 		Delay_ms(1000);
 		FIO1PIN=0x40000;
-		}}
+	}
+}
 

@@ -1,11 +1,3 @@
-Archive member included because of file (symbol)
-
-/opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_udivsi3.o)
-                              drv.o (__aeabi_uidivmod)
-/opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_divsi3.o)
-                              drv.o (__aeabi_idiv)
-/opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_dvmd_tls.o)
-                              /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_udivsi3.o) (__aeabi_idiv0)
 
 Allocating common symbols
 Common symbol       size              file
@@ -20,49 +12,11 @@ Discarded input sections
  .text          0x00000000        0x0 main.o
  .data          0x00000000        0x0 main.o
  .bss           0x00000000        0x0 main.o
- .text.Delay    0x00000000        0x0 main.o
- COMMON         0x00000000        0x0 main.o
+ .text.Delay    0x00000000       0x2c main.o
+ COMMON         0x00000000        0xc main.o
  .text          0x00000000        0x0 drv.o
  .data          0x00000000        0x0 drv.o
  .bss           0x00000000        0x0 drv.o
- .text.stepperinit
-                0x00000000        0x0 drv.o
- .text.vStepper0rise
-                0x00000000        0x0 drv.o
- .text.vStepper0down
-                0x00000000        0x0 drv.o
- .text.vStepper1rise
-                0x00000000        0x0 drv.o
- .text.vStepper1down
-                0x00000000        0x0 drv.o
- .text.lwheeltsk
-                0x00000000        0x0 drv.o
- .text.rwheeltsk
-                0x00000000        0x0 drv.o
- .text.wheel    0x00000000        0x0 drv.o
- .bss.blinky.2244
-                0x00000000        0x0 drv.o
- .bss.pasttimes.2246
-                0x00000000        0x0 drv.o
- .data.radvlcty.2221
-                0x00000000        0x0 drv.o
- .bss.odd.2223  0x00000000        0x0 drv.o
- .data.radvlcty.2243
-                0x00000000        0x0 drv.o
- .bss.blinky.2222
-                0x00000000        0x0 drv.o
- .bss.pasttimes.2224
-                0x00000000        0x0 drv.o
- .bss.odd.2245  0x00000000        0x0 drv.o
- .text          0x00000000        0x0 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_udivsi3.o)
- .data          0x00000000        0x0 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_udivsi3.o)
- .bss           0x00000000        0x0 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_udivsi3.o)
- .text          0x00000000        0x0 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_divsi3.o)
- .data          0x00000000        0x0 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_divsi3.o)
- .bss           0x00000000        0x0 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_divsi3.o)
- .text          0x00000000        0x0 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_dvmd_tls.o)
- .data          0x00000000        0x0 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_dvmd_tls.o)
- .bss           0x00000000        0x0 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_dvmd_tls.o)
 
 Memory Configuration
 
@@ -79,47 +33,47 @@ Linker script and memory map
 LOAD asmfunc.o
 LOAD main.o
 LOAD drv.o
-LOAD /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/../../../../arm-none-eabi/lib/libc.a
-LOAD /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/../../../../arm-none-eabi/lib/libm.a
-LOAD /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/../../../../arm-none-eabi/lib/libc.a
-LOAD /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a
+LOAD /opt/SourceryG++Lite/bin/../lib/gcc/arm-none-eabi/4.5.1/../../../../arm-none-eabi/lib/libc.a
+LOAD /opt/SourceryG++Lite/bin/../lib/gcc/arm-none-eabi/4.5.1/../../../../arm-none-eabi/lib/libm.a
+LOAD /opt/SourceryG++Lite/bin/../lib/gcc/arm-none-eabi/4.5.1/../../../../arm-none-eabi/lib/libc.a
+LOAD /opt/SourceryG++Lite/bin/../lib/gcc/arm-none-eabi/4.5.1/libgcc.a
 START GROUP
-LOAD /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a
-LOAD /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/../../../../arm-none-eabi/lib/libc.a
+LOAD /opt/SourceryG++Lite/bin/../lib/gcc/arm-none-eabi/4.5.1/libgcc.a
+LOAD /opt/SourceryG++Lite/bin/../lib/gcc/arm-none-eabi/4.5.1/../../../../arm-none-eabi/lib/libc.a
 END GROUP
 
-.text           0x00000000      0x67c
+.text           0x00000000      0x668
  *(.VECTOR)
  .VECTOR        0x00000000       0x40 asmfunc.o
  *(.text .text.*)
  .text          0x00000040      0x394 asmfunc.o
-                0x0000026c                Sleep
-                0x00000204                FiqDisable
-                0x00000214                ClearVector
-                0x0000028c                Load_Block
                 0x000001f4                IrqDisable
-                0x00000238                DispatchTask
                 0x000001fc                IrqEnable
-                0x000002fc                Store_Block
+                0x00000204                FiqDisable
                 0x0000020c                FiqEnable
-                0x00000224                StartTask
+                0x00000214                ClearVector
                 0x0000021c                RegisterVector
+                0x00000224                StartTask
+                0x00000238                DispatchTask
+                0x0000026c                Sleep
+                0x0000028c                Load_Block
+                0x000002fc                Store_Block
  .text.Isr_TIMER0
                 0x000003d4       0x28 main.o
                 0x000003d4                Isr_TIMER0
  .text.Delay_ms
                 0x000003fc       0x1c main.o
                 0x000003fc                Delay_ms
- .text.ymzwrite0
-                0x00000418       0x68 main.o
-                0x00000418                ymzwrite0
- .text.ymzwrite1
-                0x00000480       0x38 main.o
-                0x00000480                ymzwrite1
- .text.main     0x000004b8      0x120 main.o
-                0x000004b8                main
- .text.set_pll  0x000005d8       0xa4 drv.o
-                0x000005d8                set_pll
+ .text.ymzwritelong
+                0x00000418       0x64 main.o
+                0x00000418                ymzwritelong
+ .text.ymzwritebyte
+                0x0000047c       0x30 main.o
+                0x0000047c                ymzwritebyte
+ .text.main     0x000004ac      0x11c main.o
+                0x000004ac                main
+ .text.set_pll  0x000005c8       0xa0 drv.o
+                0x000005c8                set_pll
  *(.gnu.linkonce.t.*)
  *(.glue_7)
  .glue_7        0x00000000        0x0 linker stubs
@@ -129,18 +83,18 @@ END GROUP
  *(.rodata)
  *(.rodata*)
  *(.gnu.linkonce.r.*)
-                0x0000067c                . = ALIGN (0x4)
+                0x00000668                . = ALIGN (0x4)
 
-.vfp11_veneer   0x0000067c        0x0
+.vfp11_veneer   0x00000668        0x0
  .vfp11_veneer  0x00000000        0x0 linker stubs
 
-.v4_bx          0x0000067c        0x0
+.v4_bx          0x00000668        0x0
  .v4_bx         0x00000000        0x0 linker stubs
-                0x0000067c                . = ALIGN (0x4)
-                0x0000067c                _etext = .
-                0x0000067c                PROVIDE (etext, .)
+                0x00000668                . = ALIGN (0x4)
+                0x00000668                _etext = .
+                0x00000668                PROVIDE (etext, .)
 
-.data           0x40000000        0x4 load address 0x0000067c
+.data           0x40000000        0x4 load address 0x00000668
                 0x40000000                _data = .
  *(.data)
  *(.data.*)
@@ -152,7 +106,7 @@ END GROUP
                 0x40000004                _edata = .
                 0x40000004                PROVIDE (edata, .)
 
-.bss            0x40000004        0x8 load address 0x00000680
+.bss            0x40000004        0x8 load address 0x0000066c
                 0x40000004                __bss_start = .
                 0x40000004                __bss_start__ = .
  *(.bss)
@@ -214,24 +168,19 @@ END GROUP
  .HEAP          0x00000000        0x0 asmfunc.o
 
 .ARM.attributes
-                0x00000000       0x2e
+                0x00000000       0x30
  .ARM.attributes
-                0x00000000       0x22 asmfunc.o
+                0x00000000       0x24 asmfunc.o
  .ARM.attributes
-                0x00000022       0x32 main.o
+                0x00000024       0x34 main.o
  .ARM.attributes
-                0x00000054       0x32 drv.o
- .ARM.attributes
-                0x00000086       0x16 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_udivsi3.o)
- .ARM.attributes
-                0x0000009c       0x16 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_divsi3.o)
- .ARM.attributes
-                0x000000b2       0x14 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_dvmd_tls.o)
+                0x00000058       0x34 drv.o
 
-.comment        0x00000000       0x56
+.comment        0x00000000       0x2a
  *(.comment)
- .comment       0x00000000       0x2b main.o
- .comment       0x0000002b       0x2b drv.o
+ .comment       0x00000000       0x2a main.o
+                                 0x2b (size before relaxing)
+ .comment       0x00000000       0x2b drv.o
 
 .debug
  *(.debug)
@@ -245,59 +194,56 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000       0xd0
+.debug_aranges  0x00000000       0x90
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0x28 asmfunc.o
  .debug_aranges
                 0x00000028       0x48 main.o
  .debug_aranges
-                0x00000070       0x60 drv.o
+                0x00000070       0x20 drv.o
 
 .debug_pubnames
-                0x00000000      0x143
+                0x00000000       0xcb
  *(.debug_pubnames)
  .debug_pubnames
-                0x00000000       0x86 main.o
+                0x00000000       0x8c main.o
  .debug_pubnames
-                0x00000086       0xbd drv.o
+                0x0000008c       0x3f drv.o
 
-.debug_info     0x00000000      0x3ea
+.debug_info     0x00000000      0x26c
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000       0x4a asmfunc.o
- .debug_info    0x0000004a      0x17d main.o
- .debug_info    0x000001c7      0x223 drv.o
+ .debug_info    0x00000000       0x54 asmfunc.o
+ .debug_info    0x00000054      0x196 main.o
+ .debug_info    0x000001ea       0x82 drv.o
 
-.debug_abbrev   0x00000000      0x1a9
+.debug_abbrev   0x00000000      0x160
  *(.debug_abbrev)
  .debug_abbrev  0x00000000       0x12 asmfunc.o
- .debug_abbrev  0x00000012       0xe9 main.o
- .debug_abbrev  0x000000fb       0xae drv.o
+ .debug_abbrev  0x00000012       0xfc main.o
+ .debug_abbrev  0x0000010e       0x52 drv.o
 
-.debug_line     0x00000000      0x356
+.debug_line     0x00000000      0x27e
  *(.debug_line)
  .debug_line    0x00000000      0x12f asmfunc.o
- .debug_line    0x0000012f       0xe2 main.o
- .debug_line    0x00000211      0x145 drv.o
+ .debug_line    0x0000012f       0xf6 main.o
+ .debug_line    0x00000225       0x59 drv.o
 
-.debug_frame    0x00000000      0x19c
+.debug_frame    0x00000000       0xa8
  *(.debug_frame)
- .debug_frame   0x00000000       0x9c main.o
- .debug_frame   0x0000009c       0xc0 drv.o
- .debug_frame   0x0000015c       0x20 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_udivsi3.o)
- .debug_frame   0x0000017c       0x20 /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_divsi3.o)
+ .debug_frame   0x00000000       0x88 main.o
+ .debug_frame   0x00000088       0x20 drv.o
 
-.debug_str      0x00000000      0x199
+.debug_str      0x00000000       0xc8
  *(.debug_str)
- .debug_str     0x00000000       0x9c main.o
-                                 0xbb (size before relaxing)
- .debug_str     0x0000009c       0xfd drv.o
-                                0x157 (size before relaxing)
+ .debug_str     0x00000000       0xba main.o
+                                 0xc7 (size before relaxing)
+ .debug_str     0x000000ba        0xe drv.o
+                                 0x61 (size before relaxing)
 
-.debug_loc      0x00000000      0x1b1
+.debug_loc      0x00000000       0xfe
  *(.debug_loc)
- .debug_loc     0x00000000       0xe4 main.o
- .debug_loc     0x000000e4       0xcd drv.o
+ .debug_loc     0x00000000       0xfe main.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -315,10 +261,10 @@ END GROUP
  *(.debug_varnames)
 OUTPUT(main.elf elf32-littlearm)
 
-.debug_ranges   0x00000000       0xb8
+.debug_ranges   0x00000000       0x68
  .debug_ranges  0x00000000       0x20 asmfunc.o
- .debug_ranges  0x00000020       0x40 main.o
- .debug_ranges  0x00000060       0x58 drv.o
+ .debug_ranges  0x00000020       0x38 main.o
+ .debug_ranges  0x00000058       0x10 drv.o
 
 Cross Reference Table
 
@@ -339,20 +285,8 @@ RegisterVector                                    asmfunc.o
 Sleep                                             asmfunc.o
 StartTask                                         asmfunc.o
 Store_Block                                       asmfunc.o
-__aeabi_idiv                                      /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_divsi3.o)
-                                                  drv.o
-__aeabi_idiv0                                     /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_dvmd_tls.o)
-                                                  /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_divsi3.o)
-                                                  /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_udivsi3.o)
-__aeabi_idivmod                                   /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_divsi3.o)
-__aeabi_ldiv0                                     /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_dvmd_tls.o)
-__aeabi_uidiv                                     /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_udivsi3.o)
-__aeabi_uidivmod                                  /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_udivsi3.o)
-                                                  drv.o
 __bss_end__                                       asmfunc.o
 __bss_start__                                     asmfunc.o
-__divsi3                                          /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_divsi3.o)
-__udivsi3                                         /opt/arm-2009q1/bin/../lib/gcc/arm-none-eabi/4.3.3/libgcc.a(_udivsi3.o)
 _data                                             asmfunc.o
 _edata                                            asmfunc.o
 _etext                                            asmfunc.o
@@ -361,19 +295,11 @@ dstnsa                                            drv.o
 dstnsb                                            drv.o
                                                   main.o
 g_i                                               main.o
-lwheeltsk                                         drv.o
 main                                              main.o
                                                   asmfunc.o
-rwheeltsk                                         drv.o
 set_pll                                           drv.o
                                                   main.o
 status                                            drv.o
                                                   main.o
-stepperinit                                       drv.o
-vStepper0down                                     drv.o
-vStepper0rise                                     drv.o
-vStepper1down                                     drv.o
-vStepper1rise                                     drv.o
-wheel                                             drv.o
-ymzwrite0                                         main.o
-ymzwrite1                                         main.o
+ymzwritebyte                                      main.o
+ymzwritelong                                      main.o

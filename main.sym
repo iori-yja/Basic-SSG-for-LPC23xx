@@ -62,11 +62,11 @@
 00000390 t sb_align
 000003d4 T Isr_TIMER0
 000003fc T Delay_ms
-00000418 T ymzwrite0
-00000480 T ymzwrite1
-000004b8 T main
-000005d8 T set_pll
-0000067c A _etext
+00000418 T ymzwritelong
+0000047c T ymzwritebyte
+000004ac T main
+000005c8 T set_pll
+00000668 A _etext
 00000800 a USR_Stack_Size
 00000a00 a Stack_Size
 00000f00 a VIC_VectAddr
